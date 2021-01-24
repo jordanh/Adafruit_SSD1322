@@ -159,15 +159,16 @@ bool Adafruit_SSD1322::begin(uint8_t addr, bool reset) {
     2, 0xa2, 0x00,			/* display offset, shift mapping ram counter */  
     2, 0xa1, 0x00,			/* display start line */  
     3, 0xa0, 0x06, 0x11,	        /* Set Re-Map / Dual COM Line Mode */
+    2, 0xb5, 0x00,                      /* disable gpio */
     2, 0xab, 0x01,			/* Enable Internal VDD Regulator */  
-    3, 0xb4, 0xa0, 0x05|0xfd,	        /* Display Enhancement A */  
+    3, 0xb4, 0xa0, 0xfd,	        /* Display Enhancement A */  
     2, 0xc1, 0x9f,			/* contrast */  
     2, 0xc7, 0x0f,			/* Set Scale Factor of Segment Output Current Control */  
     1, 0xb9,		                /* linear grayscale */
     2, 0xb1, 0xe2,			/* Phase 1 (Reset) & Phase 2 (Pre-Charge) Period Adjustment */  
-    3, 0xd1, 0x82|0x20, 0x20,	        /* Display Enhancement B */  
-    2, 0xbb, 0x1f,			/* precharge  voltage */  
-    2, 0xb6, 0x08,			/* precharge  period */  
+    3, 0xd1, 0x82, 0x20,	        /* Display Enhancement B */  
+    2, 0xbb, 0x1f,			/* precharge voltage */  
+    2, 0xb6, 0x08,			/* precharge period */  
     2, 0xbe, 0x07,			/* vcomh */  
     1, 0xa6,		                /* normal display */
     1, 0xa9		                /* exit partial display */
@@ -244,11 +245,11 @@ void Adafruit_SSD1322::display(void) {
 
   uint8_t cmd[] = {
           3, 0x75, row_start, row_end,
-          3, 0x15, (uint8_t)(28+col_start), (uint8_t)(28+col_end)  // Add OLED panel offset
+          3, 0x15, (uint8_t)(28+col_start), (uint8_t)(28+col_end),  // Add OLED panel offset
+          1, 0x5c
   };
 
   oled_commandAndArgsList(cmd, sizeof(cmd));
-  oled_command(0x5c);
 
   for (uint8_t row = row_start; row <= row_end; row++) {
     uint8_t bytes_remaining = (col_end-col_start)*2+2;
@@ -297,4 +298,9 @@ void Adafruit_SSD1322::display(void) {
 
 void Adafruit_SSD1322::invertDisplay(bool i) {
   oled_command(i ? 0xa7: 0xa6);
+}
+
+void Adafruit_SSD1322::setContrast(uint8_t level) {
+    uint8_t cmd[] = {2, 0xc7, level};
+    oled_commandAndArgsList(cmd, sizeof(cmd));
 }

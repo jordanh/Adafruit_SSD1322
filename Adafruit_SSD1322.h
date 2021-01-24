@@ -37,8 +37,7 @@ public:
   bool begin(uint8_t i2caddr = SSD1322_I2C_ADDRESS, bool reset = true);
   void display();
   void invertDisplay(bool i);
-
-  void jh_fill(uint8_t p);
+  void setContrast(uint8_t level);
 
 private:
   int8_t page_offset = 0;
